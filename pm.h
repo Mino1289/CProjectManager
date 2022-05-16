@@ -2,10 +2,17 @@
 #define __PM_H__
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-int main(int argc, char *argv[]);
-void fill_makefile(char *project_path);
-void fill_main_c(char *project_path);
-void fill_main_h(char *project_path);
+
+void fill_makefile(const char* project_path, const char* project_name);
+
+void fill_main_c(const char* project_path, const char* project_name);
+
+char* to_upper(char* str, int size);
+
+void fill_lib(const char* project_path, char* libname);
 
 #endif

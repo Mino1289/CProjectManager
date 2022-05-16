@@ -1,20 +1,43 @@
-CFLAGS = -Wall -Wextra -Werror -std=c11 -pedantic
-CC = gcc
-TCWIN = x86_64-w64-mingw32-
+CXX = gcc
+CFLAGS = -Wall -Werror -Wextra -fpic -pedantic -g
+LIBSDIR = -L. -L/usr/lib
+INCLUDEDIR = -I. -I/usr/include
 
+LIBCORENAME = pm
 
-build:
-	@mkdir -p bin
-	@$(CC) pm.c $(CFLAGS) -o bin/pm
-	@echo "CC	pm.c"
-	@echo "EXE	pm"
+ifeq ($(OS), Windows_NT)
+	EXPORT = export.bat
+	LIBTARGET :=$(LIBCORENAME:=.dll)
+	CLEANCMD = @del /q *.o *.dll *.exe *.so main.txt
+else
+	EXPORT = sh export.sh
+	LIBTARGET :=lib$(LIBCORENAME:=.so)
+	CLEANCMD = rm -rf *.o *.so *.exe *.dll main.txt
+endif
 
-buildwin:
-	@mkdir -p bin
-	@$(TCWIN)$(CC) pm.c $(CFLAGS) -o bin/pm.exe
-	@echo "CC	pm.c"
-	@echo "EXE	pm.exe"
+LIBSOURCE = pm
+LIBSOURCECFILE = $(LIBSOURCE:=.c)
+LIBSOURCEOFILE = $(LIBSOURCE:=.o)
 
-clean:
-	@rm -d -r bin
-	@echo "CLEAN"
+EXESOURCE = main
+TARGET = $(EXESOURCE:=.exe)
+EXESOURCECFILE = $(EXESOURCE:=.c)
+EXESOURCEOFILE = $(EXESOURCE:=.o)
+
+all: $(TARGET)
+
+run: $(TARGET)
+	$(EXPORT) $(TARGET)
+
+$(TARGET): $(EXESOURCEOFILE) $(LIBTARGET) 
+	$(CXX) $(EXESOURCEOFILE) -l$(LIBCORENAME) $(LIBSDIR) -o $(TARGET) -lm
+
+$(LIBTARGET): $(LIBSOURCEOFILE) 
+	$(CXX) $(CFLAGS) -shared $(LIBSOURCEOFILE) -o $(LIBTARGET)
+
+.c.o:
+	$(CXX) $(CFLAGS) $(INCLUDEDIR) -c -o $@ $<
+
+clean: 
+	$(CLEANCMD)
+	@echo CLEAN
