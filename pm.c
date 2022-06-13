@@ -8,7 +8,7 @@ void fill_makefile(const char* project_path, const char* project_name){
     char* makefile_content2 = "\n\nifeq ($(OS), Windows_NT)\n\tEXPORT = export.bat\n\tLIBTARGET :=$(LIBCORENAME:=.dll)\n\tCLEANCMD = @del /q *.o *.dll *.exe *.so main.txt\nelse\n\tEXPORT = sh export.sh\n\tLIBTARGET :=lib$(LIBCORENAME:=.so)\n\tCLEANCMD = rm -rf *.o *.so *.exe *.dll \nendif\n\nLIBSOURCE = ";
     char* makefile_content3 = "\nLIBSOURCECFILE = $(LIBSOURCE:=.c)\nLIBSOURCEOFILE = $(LIBSOURCE:=.o)\n\nEXESOURCE = main\nTARGET = $(EXESOURCE:=.exe)\nEXESOURCECFILE = $(EXESOURCE:=.c)\nEXESOURCEOFILE = $(EXESOURCE:=.o)\n\nall: $(TARGET)\n\nrun: $(TARGET)\n\t$(EXPORT) $(TARGET)\n\n$(TARGET): $(EXESOURCEOFILE) $(LIBTARGET) \n\t$(CXX) $(EXESOURCEOFILE) -l$(LIBCORENAME) $(LIBSDIR) -o $(TARGET) -lm\n\n$(LIBTARGET): $(LIBSOURCEOFILE) \n\t$(CXX) $(CFLAGS) -shared $(LIBSOURCEOFILE) -o $(LIBTARGET)\n\n.c.o:\n\t$(CXX) $(CFLAGS) $(INCLUDEDIR) -c -o $@ $<\n\nclean: \n\t$(CLEANCMD)\n\t@echo CLEAN";
     
-    FILE* makefile = fopen(makefile_path, "w"); 
+    FILE* makefile = fopen(makefile_path, "wt"); 
     fputs(makefile_content1, makefile);
     fputs(project_name, makefile);
     fputs(makefile_content2, makefile);
@@ -16,11 +16,11 @@ void fill_makefile(const char* project_path, const char* project_name){
     fputs(makefile_content3, makefile);
     fclose(makefile);
 
-    FILE* export_sh = fopen("export.sh", "w");
+    FILE* export_sh = fopen("export.sh", "wt");
     fputs("#!/bin/sh\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.\n./${1}", export_sh);
     fclose(export_sh);
 
-    FILE* export_bat = fopen("export.bat", "w");
+    FILE* export_bat = fopen("export.bat", "wt");
     fputs("@SET PATH=%PATH%;.\n%1", export_bat);
     fclose(export_bat);
 
@@ -31,7 +31,7 @@ void fill_main_c(const char* project_path, const char* project_name) {
     char* main_c_path = "main.c";
     char* main_c_content1 = "#include <";
     char* main_c_content2 = ".h>\n\nint main(int argc, char *argv[]) {\n\t/*INSERT CODE HERE*/\n\treturn EXIT_SUCCESS;\n}\n";
-    FILE* file = fopen(main_c_path, "w");
+    FILE* file = fopen(main_c_path, "wt");
 
     fputs(main_c_content1, file);
     fputs(project_name, file);
@@ -40,14 +40,11 @@ void fill_main_c(const char* project_path, const char* project_name) {
 }
 
 char* to_upper(char* str, int size) {
-    char* newstr = malloc(sizeof(char) * size);
+    char* newstr = malloc(sizeof(char) * (size + 1));
     for (int i = 0; i < size; i++) {
-        if (str[i] >= 'a' && str[i] <= 'z') {
-            newstr[i] = str[i] + 'A' - 'a';
-        } else {
-            newstr[i] = str[i];
-        }
+        newstr[i] = toupper(str[i]);
     }
+    newstr[size] = '\0';
     return newstr;
 }
 
@@ -65,7 +62,7 @@ void fill_lib(const char* project_path, char* libname) {
     char* lib_h_content2 = "_H__\n#define __";
     char* lib_h_content3 = "_H__\n\n#include <stdio.h>\n#include <stdlib.h>\n\n#endif\n";
 
-    FILE* file_h = fopen(lib_h_path, "w");
+    FILE* file_h = fopen(lib_h_path, "wt");
     fputs(lib_h_content1, file_h);
     char* libname_upper = to_upper(libname, liblen);
     fputs(libname_upper, file_h);
@@ -75,10 +72,12 @@ void fill_lib(const char* project_path, char* libname) {
 
     fclose(file_h);
 
-    FILE* file_c = fopen(lib_c_path, "w");
+    FILE* file_c = fopen(lib_c_path, "wt");
     fputs("#include <", file_c);
     fputs(libname, file_c);
     fputs(".h>\n\n", file_c);
+
+    fclose(file_c);
 
     free(libname_upper);
     free(lib_h_path);
