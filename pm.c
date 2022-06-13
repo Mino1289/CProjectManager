@@ -4,8 +4,8 @@
 void fill_makefile(const char* project_path, const char* project_name){
     chdir(project_path);
     char* makefile_path = "Makefile";
-    char* makefile_content1 = "CXX = gcc\nCFLAGS = -Wall -Werror -Wextra -fpic -pedantic -g\nLIBSDIR = -L. -L/usr/lib\nINCLUDEDIR = -I. -I/usr/include\n\nLIBCORENAME = ";
-    char* makefile_content2 = "\n\nifeq ($(OS), Windows_NT)\n\tEXPORT = export.bat\n\tLIBTARGET :=$(LIBCORENAME:=.dll)\n\tCLEANCMD = @del /q *.o *.dll *.exe *.so main.txt\nelse\n\tEXPORT = sh export.sh\n\tLIBTARGET :=lib$(LIBCORENAME:=.so)\n\tCLEANCMD = rm -rf *.o *.so *.exe *.dll \nendif\n\nLIBSOURCE = ";
+    char* makefile_content1 = "CXX = gcc\nCFLAGS = -Wall -Werror -Wextra -fpic -pedantic\nLIBSDIR = -L.\nINCLUDEDIR = -I.\n\nLIBCORENAME = ";
+    char* makefile_content2 = "\n\nDEBUG ?= 0\nifeq ($(DEBUG), 1)\n\tCFLAGS += -ggdb -DDEBUG\nendif\n\nifeq ($(OS), Windows_NT)\n\tEXPORT = export.bat\n\tLIBTARGET :=$(LIBCORENAME:=.dll)\n\tCLEANCMD = @del /q *.o *.dll *.exe *.so main.txt\nelse\n\tEXPORT = sh export.sh\n\tLIBTARGET :=lib$(LIBCORENAME:=.so)\n\tLIBSDIR += -L/usr/lib\n\tINCLUDEDIR += -I/usr/include\n\tCLEANCMD = rm -rf *.o *.so *.exe *.dll \nendif\n\nLIBSOURCE = ";
     char* makefile_content3 = "\nLIBSOURCECFILE = $(LIBSOURCE:=.c)\nLIBSOURCEOFILE = $(LIBSOURCE:=.o)\n\nEXESOURCE = main\nTARGET = $(EXESOURCE:=.exe)\nEXESOURCECFILE = $(EXESOURCE:=.c)\nEXESOURCEOFILE = $(EXESOURCE:=.o)\n\nall: $(TARGET)\n\nrun: $(TARGET)\n\t$(EXPORT) $(TARGET)\n\n$(TARGET): $(EXESOURCEOFILE) $(LIBTARGET) \n\t$(CXX) $(EXESOURCEOFILE) -l$(LIBCORENAME) $(LIBSDIR) -o $(TARGET) -lm\n\n$(LIBTARGET): $(LIBSOURCEOFILE) \n\t$(CXX) $(CFLAGS) -shared $(LIBSOURCEOFILE) -o $(LIBTARGET)\n\n.c.o:\n\t$(CXX) $(CFLAGS) $(INCLUDEDIR) -c -o $@ $<\n\nclean: \n\t$(CLEANCMD)\n\t@echo CLEAN";
     
     FILE* makefile = fopen(makefile_path, "wt"); 

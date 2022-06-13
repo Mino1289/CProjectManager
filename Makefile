@@ -1,7 +1,7 @@
 CXX = gcc
-CFLAGS = -Wall -Werror -Wextra -fpic -pedantic -g
-LIBSDIR = -L. -L/usr/lib
-INCLUDEDIR = -I. -I/usr/include
+CFLAGS = -Wall -Werror -Wextra -fpic -pedantic 
+LIBSDIR = -L.
+INCLUDEDIR = -I.
 
 LIBCORENAME = pm
 
@@ -12,6 +12,8 @@ ifeq ($(OS), Windows_NT)
 else
 	EXPORT = sh export.sh
 	LIBTARGET :=lib$(LIBCORENAME:=.so)
+	LIBSDIR += -L/usr/lib
+	INCLUDEDIR += -I/usr/include
 	CLEANCMD = rm -rf *.o *.so *.exe *.dll main.txt
 endif
 
