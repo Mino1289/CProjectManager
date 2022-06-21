@@ -1,8 +1,8 @@
 #include <pm.h>
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Usage: %s <project_name>\n", argv[0]);
+    if (argc < 2) {
+        printf("Usage: %s <project_name> <..libnames>\n", argv[0]);
         return 1;
     }
     char* project_name = (char*) malloc(strlen(argv[1]) + 1);
@@ -17,13 +17,21 @@ int main(int argc, char *argv[]) {
     printf("Creating Makefile for C\n");
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
-    fill_makefile(cwd, project_name);
 
     printf("Creating main.c\n");
     fill_main_c(cwd, project_name);
 
-    printf("Creating %s.c && %s.h\n", project_name, project_name);
-    fill_lib(cwd, project_name);
+    char** libs = (char**) malloc(sizeof(char*));
+    for (int i = 1; i < argc; i++) {
+        libs[i-1] = (char*) malloc(sizeof(char)*strlen(argv[i]));
+        strcpy(libs[i-1], argv[i]);
+
+        printf("Creating %s.c && %s.h\n", libs[i-1], libs[i-1]);
+        fill_lib(cwd, libs[i-1], i==1);
+        libs = realloc(libs, sizeof(char*)*(i+1));
+    }
+    fill_makefile(cwd, project_name, libs, argc-1);
+
     printf("Done !\nYou can start coding !\n");
     return 0;
 }

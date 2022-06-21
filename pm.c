@@ -1,7 +1,7 @@
 #include <pm.h>
 
 
-void fill_makefile(const char* project_path, const char* project_name){
+void fill_makefile(const char* project_path, const char* project_name, char** libs, int size){
     chdir(project_path);
     char* makefile_path = "Makefile";
     char* makefile_content1 = "CXX = gcc\nCFLAGS = -Wall -Werror -Wextra -fpic -pedantic\nLIBSDIR = -L.\nINCLUDEDIR = -I.\n\nLIBCORENAME = ";
@@ -12,7 +12,10 @@ void fill_makefile(const char* project_path, const char* project_name){
     fputs(makefile_content1, makefile);
     fputs(project_name, makefile);
     fputs(makefile_content2, makefile);
-    fputs(project_name, makefile);
+    for (int i = 0; i < size; i++) {
+        fputs(libs[i], makefile);
+        fputs(" ", makefile);
+    }
     fputs(makefile_content3, makefile);
     fclose(makefile);
 
@@ -49,7 +52,7 @@ char* to_upper(char* str, int size) {
 }
 
 
-void fill_lib(const char* project_path, char* libname) {
+void fill_lib(const char* project_path, char* libname, bool first) {
     chdir(project_path);
     int liblen = strlen(libname);
     char* lib_h_path = (char*) malloc(liblen + 2);
@@ -60,7 +63,9 @@ void fill_lib(const char* project_path, char* libname) {
 
     char* lib_h_content1 = "#ifndef __";
     char* lib_h_content2 = "_H__\n#define __";
-    char* lib_h_content3 = "_H__\n\n#include <stdio.h>\n#include <stdlib.h>\n#define ll long long\n#define ld long double\n#define ull unsigned long long\n#define uld unsigned long double\n\n#define ABS(a)      ((a) < 0 ? -(a) : (a))\n#define MAX(a, b)   ((a + b + ABS(a-b)) / 2)\n#define MIN(a, b)   ((a) < (b) ? (a) : (b))\n#define SWAP(a, b, T)  {T tmp = a; a = b; b = tmp;}\n\n\n#define F_OR(i, a, b, s)            for (int i = (a); (s) > 0 ? i < (b) : i > (b); i += (s))\n#define F_OR1(e)                    F_OR(i, 0, e, 1)\n#define F_OR2(i, e)                 F_OR(i, 0, e, 1)\n#define F_OR3(i, b, e)              F_OR(i, b, e, 1)\n#define F_OR4(i, b, e, s)           F_OR(i, b, e, s)\n#define GET5(a, b, c, d, e, ...)    e\n#define F_ORC(...)                  GET5(__VA_ARGS__, F_OR4, F_OR3, F_OR2, F_OR1)\n/**\n * @brief max 4 arguments\n * First : the name of the variable the i in 'for (int i = 0; i < n; i++)' (if ommited 'i') (the last to be ommited)\n * Second : the start of the loop   (if ommited 0)      (the second to be ommited)\n * Third : the end of the loop      (can't be ommited)   \n * Fourth : the step of the loop    (if ommited 1)      (the first to be ommited)\n */\n#define FOR(...) F_ORC(__VA_ARGS__)(__VA_ARGS__)\n\n\n\n\n#endif\n";
+    char* lib_h_content3 = "_H__\n\n#include <stdio.h>\n#include <stdlib.h>\n\n";
+    char* lib_h_prepro = "#define ll long long\n#define ld long double\n#define ull unsigned long long\n#define uld unsigned long double\n\n#define ABS(a)      ((a) < 0 ? -(a) : (a))\n#define MAX(a, b)   ((a + b + ABS(a-b)) / 2)\n#define MIN(a, b)   ((a) < (b) ? (a) : (b))\n#define SWAP(a, b, T)  {T tmp = a; a = b; b = tmp;}\n\n\n#define F_OR(i, a, b, s)            for (int i = (a); (s) > 0 ? i < (b) : i > (b); i += (s))\n#define F_OR1(e)                    F_OR(i, 0, e, 1)\n#define F_OR2(i, e)                 F_OR(i, 0, e, 1)\n#define F_OR3(i, b, e)              F_OR(i, b, e, 1)\n#define F_OR4(i, b, e, s)           F_OR(i, b, e, s)\n#define GET5(a, b, c, d, e, ...)    e\n#define F_ORC(...)                  GET5(__VA_ARGS__, F_OR4, F_OR3, F_OR2, F_OR1)\n/**\n * @brief max 4 arguments\n * First : the name of the variable the i in 'for (int i = 0; i < n; i++)' (if ommited 'i') (the last to be ommited)\n * Second : the start of the loop   (if ommited 0)      (the second to be ommited)\n * Third : the end of the loop      (can't be ommited)   \n * Fourth : the step of the loop    (if ommited 1)      (the first to be ommited)\n */\n#define FOR(...) F_ORC(__VA_ARGS__)(__VA_ARGS__)\n\n";
+    char* lib_h_endif = "\n\n#endif\n";
 
     FILE* file_h = fopen(lib_h_path, "wt");
     fputs(lib_h_content1, file_h);
@@ -69,6 +74,10 @@ void fill_lib(const char* project_path, char* libname) {
     fputs(lib_h_content2, file_h);
     fputs(libname_upper, file_h);
     fputs(lib_h_content3, file_h);
+    if (first) {
+        fputs(lib_h_prepro, file_h);
+    }
+    fputs(lib_h_endif, file_h);
 
     fclose(file_h);
 
