@@ -8,13 +8,13 @@ LIBCORENAME = pm
 ifeq ($(OS), Windows_NT)
 	EXPORT = export.bat
 	LIBTARGET :=$(LIBCORENAME:=.dll)
-	CLEANCMD = @del /q *.o *.dll *.exe *.so main.txt
+	CLEANCMD = @del /q *.o *.dll *.exe *.so
 else
 	EXPORT = sh export.sh
 	LIBTARGET :=lib$(LIBCORENAME:=.so)
 	LIBSDIR += -L/usr/lib
 	INCLUDEDIR += -I/usr/include
-	CLEANCMD = rm -rf *.o *.so *.exe *.dll main.txt
+	CLEANCMD = rm -rf *.o *.so *.exe *.dll
 endif
 
 LIBSOURCE = pm
