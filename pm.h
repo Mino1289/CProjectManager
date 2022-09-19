@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 
 
-void fill_makefile(const char* project_path, const char* project_name, char** libs, int size);
+void fill_ext(const char* project_path, const char* project_name, char** libs, int size);
 
 void fill_main_c(const char* project_path, const char* project_name);
 

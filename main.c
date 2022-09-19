@@ -14,7 +14,6 @@ int main(int argc, char *argv[]) {
     mkdir(project_name, 0777);
 #endif
     chdir(project_name);
-    printf("Creating Makefile for C\n");
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
 
@@ -30,14 +29,15 @@ int main(int argc, char *argv[]) {
         fill_lib(cwd, libs[i-1], i==1);
         libs = realloc(libs, sizeof(char*)*(i+1));
     }
-    fill_makefile(cwd, project_name, libs, argc-1);
+    fill_ext(cwd, project_name, libs, argc-1);
+    printf("Creating Makefile for C\n");
     
-    for (int i = 1; i < argc; i++) {
+    for (int i = 1; i < argc-1; i++) {
         free(libs[i]);
     }
     free(libs);
     free(project_name);
 
     printf("Done !\nYou can start coding !\n");
-    return 0;
+    return EXIT_SUCCESS;
 }

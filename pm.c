@@ -1,10 +1,11 @@
 #include <pm.h>
 
 
-void fill_makefile(const char* project_path, const char* project_name, char** libs, int size){
+void fill_ext(const char* project_path, const char* project_name, char** libs, int size){
+    // makefile
     chdir(project_path);
     char* makefile_path = "Makefile";
-    char* makefile_content1 = "CXX = gcc\nCFLAGS = -Wall -Werror -Wextra -fpic -pedantic\nLIBSDIR = -L.\nINCLUDEDIR = -I.\n\nLIBCORENAME = ";
+    char* makefile_content1 = "CXX = gcc\nCFLAGS = -Wall -Werror -fpic -pedantic\nLIBSDIR = -L.\nINCLUDEDIR = -I.\n\nLIBCORENAME = ";
     char* makefile_content2 = "\n\nDEBUG ?= 0\nifeq ($(DEBUG), 1)\n\tCFLAGS += -ggdb -DDEBUG\nendif\n\nifeq ($(OS), Windows_NT)\n\tEXPORT = export.bat\n\tLIBTARGET :=$(LIBCORENAME:=.dll)\n\tCLEANCMD = @del /q *.o *.dll *.exe *.so main.txt\nelse\n\tEXPORT = sh export.sh\n\tLIBTARGET :=lib$(LIBCORENAME:=.so)\n\tLIBSDIR += -L/usr/lib\n\tINCLUDEDIR += -I/usr/include\n\tCLEANCMD = rm -rf *.o *.so *.exe *.dll \nendif\n\nLIBSOURCE = ";
     char* makefile_content3 = "\nLIBSOURCECFILE = $(LIBSOURCE:=.c)\nLIBSOURCEOFILE = $(LIBSOURCE:=.o)\n\nEXESOURCE = main\nTARGET = $(EXESOURCE:=.exe)\nEXESOURCECFILE = $(EXESOURCE:=.c)\nEXESOURCEOFILE = $(EXESOURCE:=.o)\n\nall: $(TARGET)\n\nrun: $(TARGET)\n\t$(EXPORT) $(TARGET)\n\n$(TARGET): $(EXESOURCEOFILE) $(LIBTARGET) \n\t$(CXX) $(EXESOURCEOFILE) -l$(LIBCORENAME) $(LIBSDIR) -o $(TARGET) -lm\n\n$(LIBTARGET): $(LIBSOURCEOFILE) \n\t$(CXX) $(CFLAGS) -shared $(LIBSOURCEOFILE) -o $(LIBTARGET)\n\n.c.o:\n\t$(CXX) $(CFLAGS) $(INCLUDEDIR) -c -o $@ $<\n\nclean: \n\t$(CLEANCMD)\n\t@echo CLEAN";
     
@@ -19,6 +20,7 @@ void fill_makefile(const char* project_path, const char* project_name, char** li
     fputs(makefile_content3, makefile);
     fclose(makefile);
 
+    // export
     FILE* export_sh = fopen("export.sh", "wt");
     fputs("#!/bin/sh\nexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.\n./${1}", export_sh);
     fclose(export_sh);
@@ -27,6 +29,17 @@ void fill_makefile(const char* project_path, const char* project_name, char** li
     fputs("@SET PATH=%PATH%;.\n%1", export_bat);
     fclose(export_bat);
 
+    // gitignore
+    FILE* gitignore = fopen(".gitignore", "wt");
+    fputs("*.o\n*.exe\n*.dll\n*.so", gitignore);
+    fclose(gitignore);
+
+    // readme
+    FILE* readme = fopen("README.md", "wt");
+    fputs("# ", readme);
+    fputs(project_name, readme);
+    fputs("\n\n## Description\n\n## Compiling\n```sh\nmake run -j4\n```\n\n## Usage\n\n## License", readme);
+    fclose(readme);
 }
 
 void fill_main_c(const char* project_path, const char* project_name) {
