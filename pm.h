@@ -18,4 +18,6 @@ char* to_upper(char* str, int size);
 
 void fill_lib(const char* project_path, char* libname, bool first);
 
-#endif
+void makefile_only(const char* makefile_path);
+
+#endif // __PM_H__

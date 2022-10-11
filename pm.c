@@ -105,3 +105,20 @@ void fill_lib(const char* project_path, char* libname, bool first) {
     free(lib_h_path);
     free(lib_c_path);
 }
+
+void makefile_only(const char* makefile_path) {
+    if (!access("Makefile", F_OK)) {
+        printf("Makefile already exists\n");
+        printf("Do you want to overwrite it ? (y/n) ");
+        char c = getchar();
+        if (c != 'y') {
+            return;
+        }
+    }
+    chdir(makefile_path);
+    FILE* makefile = fopen("Makefile", "wt");
+    char* makefile_content = "CC=gcc\nCFLAGS=-Wall -Wextra -Werror -pedantic -lm\n\nifeq ($(DEBUG), 1)\n\tCFLAGS += -ggdb -DDEBUG\nendif\n\nifeq ($(OS), Windows_NT)\n\tCLEANCMD = @del /q *.exe\nelse\n\tCLEANCMD = rm -rf *.exe\nendif\n\n.c:.exe\n\t$(CC) $< $(CFLAGS) -o $@.exe\n\nclean:\n\t$(CLEANCMD)\n";
+    fputs(makefile_content, makefile);
+
+    fclose(makefile);
+}

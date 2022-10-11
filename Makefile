@@ -1,9 +1,6 @@
 CXX = gcc
 CFLAGS = -Wall -Werror -Wextra -fpic -pedantic 
-LIBSDIR = -L.
 INCLUDEDIR = -I.
-
-LIBCORENAME = pm
 
 ifeq ($(OS), Windows_NT)
 	EXPORT = export.bat
@@ -31,11 +28,8 @@ all: $(TARGET)
 run: $(TARGET)
 	$(EXPORT) $(TARGET)
 
-$(TARGET): $(EXESOURCEOFILE) $(LIBTARGET) 
-	$(CXX) $(EXESOURCEOFILE) -l$(LIBCORENAME) $(LIBSDIR) -o $(TARGET) -lm
-
-$(LIBTARGET): $(LIBSOURCEOFILE) 
-	$(CXX) $(CFLAGS) -shared $(LIBSOURCEOFILE) -o $(LIBTARGET)
+$(TARGET): $(EXESOURCEOFILE) $(LIBSOURCEOFILE)
+	$(CXX) $(EXESOURCEOFILE) $(LIBSOURCEOFILE) -o $(TARGET) -lm
 
 .c.o:
 	$(CXX) $(CFLAGS) $(INCLUDEDIR) -c -o $@ $<
